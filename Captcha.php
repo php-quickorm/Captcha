@@ -10,24 +10,27 @@ class Captcha
 {
     private $str = "ABCDEFGHIJKLMNOPQRSTUVWXYZaabcdefghijklmnopqrstuvwxyz1234567890";
     private $font;
-    private $im;
+    private $imageResource;
     private $level;
     private $code;
+    private $caseSensitive;
 
     /**
      * Captcha constructor.
      * @param int $level
+     * @param boolean $caseSensitive
      */
-    public function __construct($level = 2)
+    public function __construct($level = 2, $caseSensitive = false)
     {
         $this->level = $level;
+        $this->caseSensitive = $caseSensitive;
 
-        // load the truetype font
-        $this->font = realpath('./arial.ttf');
+        // load the TrueType font
+        $this->font = __DIR__.'/arial.ttf';
 
         // create image
-        $this->im = imagecreate(200, 77);
-        imagecolorallocate($this->im, 255, 255, 255);
+        $this->imageResource = imagecreate(200, 77);
+        imagecolorallocate($this->imageResource, 255, 255, 255);
 
         // generate
         $this->generate();
@@ -43,7 +46,7 @@ class Captcha
      */
     public function getImageResource()
     {
-        return $this->im;
+        return $this->imageResource;
     }
 
     /**
@@ -61,8 +64,8 @@ class Captcha
     {
         header('Content-Type: image/png');
 
-        imagepng($this->im);
-        imagedestroy($this->im);
+        imagepng($this->imageResource);
+        imagedestroy($this->imageResource);
     }
 
     /**
@@ -81,10 +84,24 @@ class Captcha
 
             // get font size
             $fontSize = ($this->level > 1) ? rand(20, 48) : 28;
-            imagettftext($this->im, $fontSize, rand(-35, 35), 35 * $i, 55, imagecolorallocate($this->im, rand(0, 240), rand(0, 240), rand(0, 240)), $this->font, $char);
+            imagettftext($this->imageResource, $fontSize, rand(-35, 35), 35 * $i, 55, imagecolorallocate($this->imageResource, rand(0, 240), rand(0, 240), rand(0, 240)), $this->font, $char);
         }
 
-        $this->code = $output;
+        $this->code =  ($this->caseSensitive) ? $output : strtolower($output);
+    }
+
+    /**
+     * @param $str
+     * @return bool
+     * check the code
+     */
+    public function check($str){
+        if (!$this->caseSensitive){
+            return strtolower($str) == strtolower($this->code);
+        }
+        else{
+            return $str == $this->code;
+        }
     }
 
     /**
@@ -95,11 +112,11 @@ class Captcha
 
         $lines = rand(1, 3);
         for ($i = 0; $i < $lines; $i++) {
-            imageline($this->im, rand(0, 200), rand(0, -77), rand(0, 200), rand(77, 144), imagecolorallocate($this->im, rand(0, 240), rand(0, 240), rand(0, 240)));
+            imageline($this->imageResource, rand(0, 200), rand(0, -77), rand(0, 200), rand(77, 144), imagecolorallocate($this->imageResource, rand(0, 240), rand(0, 240), rand(0, 240)));
         }
 
         for ($i = 0; $i < 5 - $lines; $i++) {
-            imageline($this->im, rand(0, -200), rand(0, 77), rand(200, 400), rand(0, 77), imagecolorallocate($this->im, rand(0, 240), rand(0, 240), rand(0, 240)));
+            imageline($this->imageResource, rand(0, -200), rand(0, 77), rand(200, 400), rand(0, 77), imagecolorallocate($this->imageResource, rand(0, 240), rand(0, 240), rand(0, 240)));
         }
     }
 }
