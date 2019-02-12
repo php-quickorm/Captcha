@@ -1,0 +1,12 @@
+{
+    "name": "php-quickorm/captcha",
+    "description": "A library implemented by PHP to generate captcha easily.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Rytia",
+            "email": "Rytia@Outlook.com"
+        }
+    ],
+    "require": {}
+}
