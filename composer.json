@@ -8,5 +8,8 @@
             "email": "Rytia@Outlook.com"
         }
     ],
-    "require": {}
+    "require": {},
+    "autoload": {
+        "files": ["Captcha.php"]
+    }
 }
